@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        {% comment %} {% load static %} {% endcomment %}
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+        <title>TaskMaster</title>
+        {% comment %} <link rel="stylesheet" href="{% static 'css/style.css' %}"> {% endcomment %}
+    </head>
+
+    <body>
+        <nav>
+            <a href="{% url 'index' %}">Home</a>
+            <a href="{% url 'project-list' %}">My Projects</a>
+            <a href="{% url 'task-list' %}">My Tasks</a>
+            {% comment %} <a href="{% url 'spaces' %}">Spaces</a> {% endcomment %}
+            {% comment %} <a href="{% url 'profile' %}">Profile</a> {% endcomment %}
+            <a href="{% url 'logout' %}">Logout</a>
+        </nav>
+        {% block content %}     
+        {% endblock %}
+        <footer>
+            <div class="footer-content">
+                <p>&copy; 2024 TaskMaster. All rights reserved.</p>
+            </div>
+        </footer>
+    </body>
+</html>
+

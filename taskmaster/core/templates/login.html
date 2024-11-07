@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% comment %} {% load static %} {% endcomment %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    {% comment %} <link rel="stylesheet" href="{% static 'css/style.css' %}"> {% endcomment %}
+</head>
+<body>
+    <header>
+        <h1>Login</h1>
+    </header>
+    <div class="container">
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="button">Login</button>
+        </form>
+        <p>Don't have an account? <a href="{% url 'register' %}">Sign up</a></p>
+        <p>Forgot your password? <a href="{% url 'password_reset' %}">Reset it here</a></p>
+    </div>
+    <footer>
+        <p>&copy; 2024 TaskMaster. All rights reserved.</p>
+    </footer>
+</body>
+</html>

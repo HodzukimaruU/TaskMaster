@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h2>
+        {% if form.instance.pk %}
+            {{ form.instance.title }}
+        {% else %}
+            Create New Task
+        {% endif %}
+    </h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Save Task</button>
+    </form>
+{% endblock %}

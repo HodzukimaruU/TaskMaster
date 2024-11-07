@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h2>My Tasks</h2>
+    <a href="{% url 'task-create' %}">Create New Task</a>
+    <form method="get">
+        <label>Status:</label>
+        <select name="status">
+            <option value="">All</option>
+            <option value="todo">To Do</option>
+            <option value="in_progress">In Progress</option>
+            <option value="done">Done</option>
+        </select>
+        <label>Priority:</label>
+        <select name="priority">
+            <option value="">All</option>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+        </select>
+        <button type="submit">Filter</button>
+    </form>
+    <ul>
+        {% for task in tasks %}
+            <li>
+                <a href="{% url 'task-detail' task.pk %}">{{ task.title }}</a> - {{ task.get_priority_display }} - {{ task.get_status_display }}
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
