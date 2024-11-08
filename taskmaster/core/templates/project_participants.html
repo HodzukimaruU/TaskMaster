@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Project Participants: {{ project.title }}</h2>
+
+<ul>
+    {% for membership in participants %}
+        <li>{{ membership.user.username }} - 
+            {% if membership.role == 'owner' %}
+                Owner
+            {% else %}
+                {{ membership.get_role_display }}
+            {% endif %}
+        </li>
+    {% empty %}
+        <p>В этом проекте нет участников.</p>
+    {% endfor %}
+</ul>
+
+{% endblock %}

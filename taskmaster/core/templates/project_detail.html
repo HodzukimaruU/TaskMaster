@@ -3,15 +3,37 @@
 {% block content %}
 <h2>{{ project.title }}</h2>
 <p>{{ project.description }}</p>
-<a href="{% url 'send_invitation' project.id %}">Invite user</a>
 
-<!-- Ссылка на создание новой задачи, привязанной к текущему проекту -->
-<a href="{% url 'task-create' %}?project={{ project.id }}">Create New Taskу</a>
+{% if is_owner %}
+    <a href="{% url 'send_invitation' project.id %}">Invite user</a>
+{% endif %}
 
+{% if role == 'editor' or is_owner %}
+    <a href="{% url 'task-create' %}?project={{ project.id }}">Create New Task</a>
+{% endif %}
+
+<a href="{% url 'project-participants' project.id %}">Project participants</a>
+
+<form method="get">
+    <label>Status:</label>
+    <select name="status">
+        <option value="">All</option>
+        <option value="todo">To Do</option>
+        <option value="in_progress">In Progress</option>
+        <option value="done">Done</option>
+    </select>
+    <label>Priority:</label>
+    <select name="priority">
+        <option value="">All</option>
+        <option value="low">Low</option>
+        <option value="medium">Medium</option>
+        <option value="high">High</option>
+    </select>
+    <button type="submit">Filter</button>
+</form>
 <ul>
     {% for task in project.tasks.all %}
         <li>
-            <!-- Ссылка на страницу задачи -->
             <a href="{% url 'task-detail' task.pk %}">{{ task.title }}</a> - {{ task.get_status_display }}
         </li>
     {% empty %}
@@ -19,6 +41,9 @@
     {% endfor %}
 </ul>
 
-<a href="{% url 'project-update' project.id %}">Edit project</a>
-<a href="{% url 'project-delete' project.id %}">Delete project</a>
+{% if is_owner %}
+    <a href="{% url 'project-update' project.id %}">Edit project</a>
+    <a href="{% url 'project-delete' project.id %}">Delete project</a>
+{% endif %}
+
 {% endblock %}

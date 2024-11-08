@@ -5,6 +5,15 @@
 <p>Priority: {{ task.get_priority_display }}</p>
 <p>Status: {{ task.get_status_display }}</p>
 <p>Due Date: {{ task.due_date }}</p>
-<a href="{% url 'task-update' task.pk %}">Edit Task</a>
-<a href="{% url 'task-delete' task.pk %}">Delete Task</a>
+
+{% if task.owner == user %}
+    <a href="{% url 'task-update' task.pk %}">Edit Task</a>
+    <a href="{% url 'task-delete' task.pk %}">Delete Task</a>
+{% elif role == 'editor' %}
+    {% if task.project %}
+        <a href="{% url 'task-update' task.pk %}">Edit Task</a>
+        <a href="{% url 'task-delete' task.pk %}">Delete Task</a>
+    {% endif %}
+{% endif %}
+
 {% endblock %}

@@ -8,6 +8,7 @@ from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.core.mail import send_mail
+from django.core.exceptions import PermissionDenied
 from django.conf import settings
 
 from django.http import HttpResponseBadRequest, HttpResponse, HttpResponseForbidden, Http404
@@ -114,6 +115,14 @@ def project_create(request):
     return render(request, 'project_form.html', {'form': form})
 
 
+def get_user_role_in_project(user, project):
+    try:
+        membership = ProjectMembership.objects.get(user=user, project=project)
+        return membership.role
+    except ProjectMembership.DoesNotExist:
+        return None
+
+
 @login_required
 def project_detail(request, pk):
     project = Project.objects.filter(
@@ -122,9 +131,17 @@ def project_detail(request, pk):
     
     if not project:
         raise Http404("Проект не найден или у вас нет доступа.")
-    
+
+    role = get_user_role_in_project(request.user, project)
     tasks = project.tasks.all()
-    return render(request, 'project_detail.html', {'project': project, 'tasks': tasks})
+    is_owner = request.user == project.owner
+    
+    return render(request, 'project_detail.html', {
+        'project': project,
+        'tasks': tasks,
+        'role': role,
+        'is_owner': is_owner
+    })
 
 
 @login_required
@@ -148,6 +165,20 @@ def project_delete(request, pk):
         return redirect('project-list')
     return render(request, 'project_confirm_delete.html', {'project': project})
 
+@login_required
+def project_participants(request, pk):
+    project = get_object_or_404(Project, pk=pk, members=request.user)
+
+    participants = ProjectMembership.objects.filter(project=project)
+
+    if project.owner not in [membership.user for membership in participants]:
+        participants = list(participants)
+        participants.insert(0, ProjectMembership(project=project, user=project.owner, role='owner'))
+
+    return render(request, 'project_participants.html', {
+        'project': project,
+        'participants': participants
+    })
 
 # Task View
 @login_required
@@ -167,31 +198,41 @@ def task_list(request):
 @login_required
 def task_create(request):
     project = None
-    # Проверяем, передан ли проект в URL
     if 'project' in request.GET:
         project_id = request.GET['project']
-        project = Project.objects.get(id=project_id)
-    
-    # Заполняем форму текущим проектом, если он существует
+        project = get_object_or_404(Project, id=project_id)
+
+    if project:
+        role = get_user_role_in_project(request.user, project)
+        if role != 'editor' and request.user != project.owner:
+            raise PermissionDenied("У вас нет прав для добавления задач в этом проекте.")
+
     form = TaskForm(initial={'project': project}) if project else TaskForm()
 
     if request.method == 'POST':
         form = TaskForm(request.POST)
         if form.is_valid():
             task = form.save(commit=False)
-            # Если проект передан, то автоматически связываем его с задачей
+            task.owner = request.user  # Назначаем владельцем текущего пользователя
             if project:
                 task.project = project
-            task.assigned_to = request.user  # Присваиваем задачу текущему пользователю
+            task.assigned_to = request.user
             task.save()
-            return redirect('task-list')  # Можно изменить на страницу с задачами
+            return redirect('task-list')
 
     return render(request, 'task_form.html', {'form': form})
 
 
+
 @login_required
 def task_update(request, pk):
-    task = get_object_or_404(Task, pk=pk, assigned_to=request.user)
+    task = get_object_or_404(Task, pk=pk)
+    project = task.project
+    role = get_user_role_in_project(request.user, project)
+
+    if request.user != task.assigned_to and role != 'editor' and project.owner != request.user:
+        raise PermissionDenied("У вас нет прав на редактирование этой задачи.")
+    
     if request.method == 'POST':
         form = TaskForm(request.POST, instance=task)
         if form.is_valid():
@@ -201,24 +242,37 @@ def task_update(request, pk):
         form = TaskForm(instance=task)
     return render(request, 'task_form.html', {'form': form})
 
+
 @login_required
 def task_detail(request, pk):
     try:
-        # Проверяем, что пользователь является участником проекта, связанного с задачей, или задачей назначенным на него
         task = Task.objects.get(pk=pk)
-        if task.project and (task.project.owner != request.user and not task.project.members.filter(id=request.user.id).exists()):
-            raise Http404("У вас нет доступа к этой задаче.")
-        if task.assigned_to != request.user and not (task.project and task.project.members.filter(id=request.user.id).exists()):
+        project = task.project
+
+        if task.assigned_to != request.user and not (project and project.members.filter(id=request.user.id).exists()):
             raise Http404("У вас нет доступа к этой задаче.")
     except Task.DoesNotExist:
         raise Http404("Задача не найдена.")
     
-    return render(request, 'task_detail.html', {'task': task})
+    role = get_user_role_in_project(request.user, project) if project else None
+    is_owner = task.owner == request.user
+
+    return render(request, 'task_detail.html', {
+        'task': task,
+        'role': role,
+        'is_owner': is_owner,
+    })
 
 
 @login_required
 def task_delete(request, pk):
-    task = get_object_or_404(Task, pk=pk, assigned_to=request.user)
+    task = get_object_or_404(Task, pk=pk)
+    project = task.project
+    role = get_user_role_in_project(request.user, project)
+
+    if request.user != task.assigned_to and role != 'editor' and project.owner != request.user:
+        raise PermissionDenied("У вас нет прав на удаление этой задачи.")
+
     if request.method == 'POST':
         task.delete()
         return redirect('task-list')

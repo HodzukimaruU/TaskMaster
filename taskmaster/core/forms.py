@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from .models import Project, Task, Category, ProjectInvitation
+from .models import Project, Task, ProjectInvitation
 
 class RegistrationForm(UserCreationForm):
     first_name = forms.CharField(max_length=30, required=True)
@@ -61,15 +61,10 @@ class TaskForm(forms.ModelForm):
         required=False,
         label="Проект",
     )
-    category = forms.ModelChoiceField(
-        queryset=Category.objects.all(),
-        required=False,
-        label="Категория",
-    )
 
     class Meta:
         model = Task
-        fields = ['title', 'description', 'due_date', 'priority', 'status', 'project', 'category']
+        fields = ['title', 'description', 'due_date', 'priority', 'status', 'project']
 
 class ProjectInvitationForm(forms.ModelForm):
     class Meta:

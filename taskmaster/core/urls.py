@@ -3,7 +3,7 @@ from django.contrib.auth import views as auth_views
 from .views import (
     index, register_view, login_view, logout_view,
     confirm_email, confirm_email_stub_controller,
-    project_list, project_create, project_detail, project_update, project_delete,
+    project_list, project_create, project_detail, project_update, project_delete, project_participants,
     task_list, task_create, task_update, task_delete, task_detail,
     send_invitation, accept_invitation, notifications
     )
@@ -34,6 +34,8 @@ urlpatterns = [
     path('tasks/<int:pk>/delete/', task_delete, name='task-delete'),
 
     path('projects/<int:project_id>/invite/', send_invitation, name='send_invitation'),
+    path('projects/<int:pk>/participants/', project_participants, name='project-participants'),
+
     path('invitations/accept/<int:invitation_id>/', accept_invitation, name='accept_invitation'),
     path('notifications/', notifications, name='notifications'),
 
