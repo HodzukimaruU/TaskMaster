@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Invitations</h2>
+<ul>
+    {% for invitation in invitations %}
+        <li>
+            Invitation to the project {{ invitation.project.title }} <br>
+            Invited: {{ invitation.inviter.username }} <br>
+            Role: {{ invitation.get_role_display }}
+            <a href="{% url 'accept_invitation' invitation.id %}">Accept</a>
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}

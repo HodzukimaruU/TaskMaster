@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from .models import Project, Task, Category
+from .models import Project, Task, Category, ProjectInvitation
 
 class RegistrationForm(UserCreationForm):
     first_name = forms.CharField(max_length=30, required=True)
@@ -70,5 +70,14 @@ class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
         fields = ['title', 'description', 'due_date', 'priority', 'status', 'project', 'category']
-        
 
+class ProjectInvitationForm(forms.ModelForm):
+    class Meta:
+        model = ProjectInvitation
+        fields = ['role']
+        widgets = {
+            'role': forms.Select(choices=[('viewer', 'Viewer'), ('editor', 'Editor')])
+        }
+        labels = {
+            'role': 'Role in the Project'
+        }

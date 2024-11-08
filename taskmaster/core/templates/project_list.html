@@ -5,8 +5,10 @@
 <ul>
     {% for project in projects %}
         <li>
-            <a href="{% url 'project-detail' project.pk %}">{{ project.title }}</a>
+            <a href="{% url 'project-detail' project.id %}">{{ project.title }}</a>
         </li>
+    {% empty %}
+        <p>У вас пока нет проектов.</p>
     {% endfor %}
 </ul>
 {% endblock %}

@@ -12,14 +12,38 @@ class BaseModel(models.Model):
     class Meta:
         abstract = True
 
-
-class Project(BaseModel):
-    title = models.CharField(max_length=200, unique=True)
-    description = models.TextField(blank=True)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="projects")
+    
+class Project(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_projects')
+    members = models.ManyToManyField(User, through='ProjectMembership', related_name='projects')
 
     def __str__(self):
         return self.title
+
+class ProjectMembership(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    role = models.CharField(max_length=10, choices=[('viewer', 'Viewer'), ('editor', 'Editor')])
+
+class ProjectInvitation(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    invited_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='invitations')
+    inviter = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_invitations')
+    role = models.CharField(max_length=10, choices=[('viewer', 'Viewer'), ('editor', 'Editor')])
+    is_accepted = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def accept_invitation(self):
+        if not self.is_accepted:
+            ProjectMembership.objects.create(
+                project=self.project,
+                user=self.invited_user,
+                role=self.role
+            )
+            self.is_accepted = True
+            self.save()
 
 class Category(models.Model):
     name = models.CharField(max_length=100)

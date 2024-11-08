@@ -2,17 +2,19 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.db.models import Q
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.core.mail import send_mail
 from django.conf import settings
 
-from django.http import HttpResponseBadRequest, HttpResponse
+from django.http import HttpResponseBadRequest, HttpResponse, HttpResponseForbidden, Http404
 from django.views.decorators.http import require_http_methods
 
-from .models import ConfirmationCode, Project, Task
-from .forms import RegistrationForm, ProjectForm, TaskForm 
+from .models import ConfirmationCode, Project, Task, ProjectInvitation, ProjectMembership
+from .forms import RegistrationForm, ProjectForm, TaskForm, ProjectInvitationForm
 
 import uuid
 import time
@@ -47,8 +49,6 @@ def register_view(request):
     else:
         form = RegistrationForm()
     return render(request, 'register.html', {'form': form})
-
-
 
 def confirm_email(request):
     code = request.GET.get('code')
@@ -90,16 +90,13 @@ def logout_view(request):
     logout(request)
     return redirect('login')
 
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.urls import reverse
-from .models import Project, Task
-from .forms import ProjectForm, TaskForm
 
 # Project Views
 @login_required
 def project_list(request):
-    projects = Project.objects.filter(owner=request.user)
+    projects = Project.objects.filter(
+        Q(owner=request.user) | Q(members=request.user)
+    ).distinct()
     return render(request, 'project_list.html', {'projects': projects})
 
 
@@ -119,7 +116,13 @@ def project_create(request):
 
 @login_required
 def project_detail(request, pk):
-    project = get_object_or_404(Project, pk=pk, owner=request.user)
+    project = Project.objects.filter(
+        Q(pk=pk) & (Q(owner=request.user) | Q(members=request.user))
+    ).distinct().first()
+    
+    if not project:
+        raise Http404("Проект не найден или у вас нет доступа.")
+    
     tasks = project.tasks.all()
     return render(request, 'project_detail.html', {'project': project, 'tasks': tasks})
 
@@ -200,8 +203,18 @@ def task_update(request, pk):
 
 @login_required
 def task_detail(request, pk):
-    task = get_object_or_404(Task, pk=pk, assigned_to=request.user)
+    try:
+        # Проверяем, что пользователь является участником проекта, связанного с задачей, или задачей назначенным на него
+        task = Task.objects.get(pk=pk)
+        if task.project and (task.project.owner != request.user and not task.project.members.filter(id=request.user.id).exists()):
+            raise Http404("У вас нет доступа к этой задаче.")
+        if task.assigned_to != request.user and not (task.project and task.project.members.filter(id=request.user.id).exists()):
+            raise Http404("У вас нет доступа к этой задаче.")
+    except Task.DoesNotExist:
+        raise Http404("Задача не найдена.")
+    
     return render(request, 'task_detail.html', {'task': task})
+
 
 @login_required
 def task_delete(request, pk):
@@ -211,3 +224,72 @@ def task_delete(request, pk):
         return redirect('task-list')
     return render(request, 'task_confirm_delete.html', {'task': task})
 
+
+#sent invite view
+@login_required
+def send_invitation(request, project_id):
+    project = get_object_or_404(Project, id=project_id, owner=request.user)
+    search_query = request.GET.get("search_user", "")
+    selected_user = None
+    error_message = ""
+
+    if search_query:
+        selected_user = User.objects.filter(username=search_query).first()
+        if not selected_user:
+            error_message = "Пользователь не найден"
+
+    if request.method == 'POST':
+        selected_username = request.POST.get("selected_user")
+        invited_user = User.objects.filter(username=selected_username).first()
+
+        if invited_user == request.user:
+            self_invitation_error = True
+            return render(request, 'send_invitation.html', {
+                'project': project,
+                'search_query': search_query,
+                'selected_user': selected_user,
+                'self_invitation_error': self_invitation_error,
+            })
+
+        if invited_user:
+            form = ProjectInvitationForm(request.POST)
+            if form.is_valid():
+                invitation = form.save(commit=False)
+                invitation.project = project
+                invitation.inviter = request.user
+                invitation.invited_user = invited_user
+                invitation.save()
+
+                success_message = f"Приглашение отправлено пользователю {invited_user.username}."
+                return render(request, 'send_invitation.html', {
+                    'project': project,
+                    'search_query': search_query,
+                    'selected_user': selected_user,
+                    'success_message': success_message,
+                })
+            else:
+                error_message = "Ошибка при отправке приглашения."
+
+    return render(request, 'send_invitation.html', {
+        'form': ProjectInvitationForm(),
+        'project': project,
+        'search_query': search_query,
+        'selected_user': selected_user,
+        'error_message': error_message,
+    })
+
+
+@login_required
+def accept_invitation(request, invitation_id):
+    invitation = get_object_or_404(ProjectInvitation, id=invitation_id, invited_user=request.user)
+    
+    if not invitation.is_accepted:
+        invitation.accept_invitation()
+    
+    return redirect('notifications')
+
+@login_required
+def notifications(request):
+    invitations = ProjectInvitation.objects.filter(invited_user=request.user, is_accepted=False)
+    user_projects = request.user.projects.all()
+    return render(request, 'notifications.html', {'invitations': invitations, 'projects': user_projects})
