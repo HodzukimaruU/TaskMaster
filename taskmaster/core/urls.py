@@ -5,7 +5,7 @@ from .views import (
     confirm_email, confirm_email_stub_controller,
     project_list, project_create, project_detail, project_update, project_delete, project_participants,
     task_list, task_create, task_update, task_delete, task_detail,
-    send_invitation, accept_invitation, notifications
+    send_invitation, accept_invitation, notifications, manage_participant
     )
 
 urlpatterns = [
@@ -35,6 +35,7 @@ urlpatterns = [
 
     path('projects/<int:project_id>/invite/', send_invitation, name='send_invitation'),
     path('projects/<int:pk>/participants/', project_participants, name='project-participants'),
+    path('projects/<int:project_id>/participant/<int:user_id>/manage/', manage_participant, name='manage_participant'),
 
     path('invitations/accept/<int:invitation_id>/', accept_invitation, name='accept_invitation'),
     path('notifications/', notifications, name='notifications'),

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Project Participants: {{ project.title }}</h2>
+<h2>Project participants: {{ project.title }}</h2>
 
 <ul>
     {% for membership in participants %}
@@ -10,6 +10,24 @@
                 Owner
             {% else %}
                 {{ membership.get_role_display }}
+            {% endif %}
+
+            {% if project.owner == request.user and membership.role != 'owner' %}
+                <!-- Форма для изменения роли -->
+                <form method="post" action="{% url 'manage_participant' project.id membership.user.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <select name="new_role">
+                        <option value="viewer" {% if membership.role == 'viewer' %}selected{% endif %}>Viewer</option>
+                        <option value="editor" {% if membership.role == 'editor' %}selected{% endif %}>Editor</option>
+                    </select>
+                    <button type="submit" name="action" value="change_role">Change role</button>
+                </form>
+
+                <!-- Форма для удаления участника -->
+                <form method="post" action="{% url 'manage_participant' project.id membership.user.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" name="action" value="remove" onclick="return confirm('Remove a member from a project?');">Delete</button>
+                </form>
             {% endif %}
         </li>
     {% empty %}

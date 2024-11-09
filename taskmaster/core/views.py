@@ -167,10 +167,15 @@ def project_delete(request, pk):
 
 @login_required
 def project_participants(request, pk):
-    project = get_object_or_404(Project, pk=pk, members=request.user)
+    project = get_object_or_404(Project, pk=pk)
+
+    # Проверка, что текущий пользователь — либо владелец проекта, либо участник
+    if project.owner != request.user and not project.members.filter(id=request.user.id).exists():
+        raise PermissionDenied("У вас нет доступа к этому проекту.")
 
     participants = ProjectMembership.objects.filter(project=project)
 
+    # Добавляем владельца проекта в список участников, если его нет
     if project.owner not in [membership.user for membership in participants]:
         participants = list(participants)
         participants.insert(0, ProjectMembership(project=project, user=project.owner, role='owner'))
@@ -180,10 +185,20 @@ def project_participants(request, pk):
         'participants': participants
     })
 
+
 # Task View
 @login_required
 def task_list(request):
-    tasks = Task.objects.filter(assigned_to=request.user)
+    # Фильтруем задачи только для проектов, в которых пользователь остаётся участником или является владельцем
+    projects = Project.objects.filter(
+        Q(owner=request.user) | Q(members=request.user)
+    ).distinct()
+
+    # Получаем задачи, привязанные к этим проектам или назначенные пользователю
+    tasks = Task.objects.filter(
+        Q(project__in=projects) | Q(assigned_to=request.user)
+    ).distinct()
+
     status = request.GET.get("status")
     priority = request.GET.get("priority")
     
@@ -347,3 +362,32 @@ def notifications(request):
     invitations = ProjectInvitation.objects.filter(invited_user=request.user, is_accepted=False)
     user_projects = request.user.projects.all()
     return render(request, 'notifications.html', {'invitations': invitations, 'projects': user_projects})
+
+
+@login_required
+def manage_participant(request, project_id, user_id):
+    project = get_object_or_404(Project, pk=project_id)
+
+    if project.owner != request.user:
+        raise PermissionDenied("У вас нет прав на управление участниками этого проекта.")
+
+    participant = get_object_or_404(ProjectMembership, project=project, user__id=user_id)
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        new_role = request.POST.get('new_role')
+
+        if action == 'change_role':
+            participant.role = new_role
+            participant.save()
+        
+        elif action == 'remove':
+
+            Task.objects.filter(project=project, owner=participant.user).update(owner=project.owner)
+            Task.objects.filter(project=project, assigned_to=participant.user).update(assigned_to=project.owner)
+
+            participant.delete()
+
+        return redirect('project-participants', pk=project_id)
+
+    return redirect('project-participants', pk=project_id)
