@@ -14,7 +14,7 @@ from django.conf import settings
 from django.http import HttpResponseBadRequest, HttpResponse, HttpResponseForbidden, Http404
 from django.views.decorators.http import require_http_methods
 
-from .models import ConfirmationCode, Project, Task, ProjectInvitation, ProjectMembership
+from .models import ConfirmationCode, Project, Task, ProjectInvitation, ProjectMembership, ProjectChatMessage
 from .forms import RegistrationForm, ProjectForm, TaskForm, ProjectInvitationForm
 
 import uuid
@@ -169,13 +169,11 @@ def project_delete(request, pk):
 def project_participants(request, pk):
     project = get_object_or_404(Project, pk=pk)
 
-    # Проверка, что текущий пользователь — либо владелец проекта, либо участник
     if project.owner != request.user and not project.members.filter(id=request.user.id).exists():
         raise PermissionDenied("У вас нет доступа к этому проекту.")
 
     participants = ProjectMembership.objects.filter(project=project)
 
-    # Добавляем владельца проекта в список участников, если его нет
     if project.owner not in [membership.user for membership in participants]:
         participants = list(participants)
         participants.insert(0, ProjectMembership(project=project, user=project.owner, role='owner'))
@@ -186,29 +184,61 @@ def project_participants(request, pk):
     })
 
 
+@login_required
+def project_chat(request, project_id):
+    project = Project.objects.get(pk=project_id)
+
+    if not ProjectMembership.objects.filter(project=project, user=request.user).exists() and project.owner != request.user:
+        raise PermissionDenied("У вас нет доступа к чату этого проекта.")
+
+    messages = ProjectChatMessage.objects.filter(project=project).order_by('created_at')
+
+    if request.method == "POST":
+        message_text = request.POST.get("message")
+        if message_text:
+            ProjectChatMessage.objects.create(project=project, user=request.user, message=message_text)
+    
+    return render(request, 'project_chat.html', {
+        'project': project,
+        'messages': messages
+    })
+
 # Task View
 @login_required
 def task_list(request):
-    # Фильтруем задачи только для проектов, в которых пользователь остаётся участником или является владельцем
     projects = Project.objects.filter(
         Q(owner=request.user) | Q(members=request.user)
     ).distinct()
 
-    # Получаем задачи, привязанные к этим проектам или назначенные пользователю
-    tasks = Task.objects.filter(
-        Q(project__in=projects) | Q(assigned_to=request.user)
+    tasks_for_projects = Task.objects.filter(
+        Q(project__in=projects)
+    ).distinct()
+
+    tasks_without_project = Task.objects.filter(
+        Q(assigned_to=request.user) & Q(project__isnull=True)
     ).distinct()
 
     status = request.GET.get("status")
     priority = request.GET.get("priority")
     
     if status:
-        tasks = tasks.filter(status=status)
+        tasks_for_projects = tasks_for_projects.filter(status=status)
+        tasks_without_project = tasks_without_project.filter(status=status)
     if priority:
-        tasks = tasks.filter(priority=priority)
+        tasks_for_projects = tasks_for_projects.filter(priority=priority)
+        tasks_without_project = tasks_without_project.filter(priority=priority)
     
-    return render(request, 'task_list.html', {'tasks': tasks})
-
+    projects_with_tasks = {}
+    for task in tasks_for_projects:
+        if task.project not in projects_with_tasks:
+            projects_with_tasks[task.project] = []
+        projects_with_tasks[task.project].append(task)
+    
+    return render(request, 'task_list.html', {
+        'tasks_for_projects': tasks_for_projects,
+        'tasks_without_project': tasks_without_project,
+        'projects_with_tasks': projects_with_tasks
+    })
 
 @login_required
 def task_create(request):
@@ -222,61 +252,57 @@ def task_create(request):
         if role != 'editor' and request.user != project.owner:
             raise PermissionDenied("У вас нет прав для добавления задач в этом проекте.")
 
-    form = TaskForm(initial={'project': project}) if project else TaskForm()
+    form = TaskForm(initial={'project': project}, project=project, hide_assigned=not project)
 
     if request.method == 'POST':
-        form = TaskForm(request.POST)
+        form = TaskForm(request.POST, project=project, hide_assigned=not project)
         if form.is_valid():
             task = form.save(commit=False)
-            task.owner = request.user  # Назначаем владельцем текущего пользователя
+            task.owner = request.user
+            if not project and not task.assigned_to:
+                task.assigned_to = request.user
             if project:
                 task.project = project
-            task.assigned_to = request.user
             task.save()
             return redirect('task-list')
 
     return render(request, 'task_form.html', {'form': form})
 
-
-
 @login_required
 def task_update(request, pk):
     task = get_object_or_404(Task, pk=pk)
-    project = task.project
-    role = get_user_role_in_project(request.user, project)
-
-    if request.user != task.assigned_to and role != 'editor' and project.owner != request.user:
-        raise PermissionDenied("У вас нет прав на редактирование этой задачи.")
     
+    hide_assigned = task.project is None
+
+    if request.user != task.owner and (task.project and get_user_role_in_project(request.user, task.project) != 'editor'):
+        raise PermissionDenied("У вас нет прав для редактирования этой задачи.")
+
+    form = TaskForm(instance=task, hide_assigned=hide_assigned)
+
     if request.method == 'POST':
-        form = TaskForm(request.POST, instance=task)
+        form = TaskForm(request.POST, instance=task, hide_assigned=hide_assigned)
         if form.is_valid():
             form.save()
-            return redirect('task-list')
-    else:
-        form = TaskForm(instance=task)
+            return redirect('task-detail', pk=task.pk)
+
     return render(request, 'task_form.html', {'form': form})
 
 
-@login_required
+
 def task_detail(request, pk):
-    try:
-        task = Task.objects.get(pk=pk)
-        project = task.project
+    task = get_object_or_404(Task, pk=pk)
 
-        if task.assigned_to != request.user and not (project and project.members.filter(id=request.user.id).exists()):
-            raise Http404("У вас нет доступа к этой задаче.")
-    except Task.DoesNotExist:
-        raise Http404("Задача не найдена.")
-    
-    role = get_user_role_in_project(request.user, project) if project else None
-    is_owner = task.owner == request.user
+    if task.assigned_to == request.user or task.owner == request.user:
+        has_access = True
+    elif task.project and task.project.members.filter(id=request.user.id).exists():
+        has_access = True
+    else:
+        has_access = False
 
-    return render(request, 'task_detail.html', {
-        'task': task,
-        'role': role,
-        'is_owner': is_owner,
-    })
+    if not has_access:
+        return HttpResponseForbidden("У вас нет доступа к этой задаче.")
+
+    return render(request, 'task_detail.html', {'task': task})
 
 
 @login_required
@@ -292,6 +318,14 @@ def task_delete(request, pk):
         task.delete()
         return redirect('task-list')
     return render(request, 'task_confirm_delete.html', {'task': task})
+
+
+#notifications
+@login_required
+def notifications(request):
+    invitations = ProjectInvitation.objects.filter(invited_user=request.user, is_accepted=False)
+    user_projects = request.user.projects.all()
+    return render(request, 'notifications.html', {'invitations': invitations, 'projects': user_projects})
 
 
 #sent invite view
@@ -358,10 +392,14 @@ def accept_invitation(request, invitation_id):
     return redirect('notifications')
 
 @login_required
-def notifications(request):
-    invitations = ProjectInvitation.objects.filter(invited_user=request.user, is_accepted=False)
-    user_projects = request.user.projects.all()
-    return render(request, 'notifications.html', {'invitations': invitations, 'projects': user_projects})
+def reject_invitation(request, invitation_id):
+    invitation = get_object_or_404(ProjectInvitation, id=invitation_id, invited_user=request.user)
+    
+    if not invitation.is_accepted:
+        invitation.is_accepted = True
+        invitation.save()
+
+    return redirect('notifications')
 
 
 @login_required

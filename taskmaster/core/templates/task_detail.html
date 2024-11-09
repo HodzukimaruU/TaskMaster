@@ -5,6 +5,7 @@
 <p>Priority: {{ task.get_priority_display }}</p>
 <p>Status: {{ task.get_status_display }}</p>
 <p>Due Date: {{ task.due_date }}</p>
+<p><strong>Task Responsible:</strong> {{ task.assigned_to.username }}</p>
 
 {% if task.owner == user %}
     <a href="{% url 'task-update' task.pk %}">Edit Task</a>

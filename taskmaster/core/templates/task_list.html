@@ -2,6 +2,7 @@
 {% block content %}
     <h2>My Tasks</h2>
     <a href="{% url 'task-create' %}">Create New Task</a>
+    
     <form method="get">
         <label>Status:</label>
         <select name="status">
@@ -19,11 +20,27 @@
         </select>
         <button type="submit">Filter</button>
     </form>
+
+    <h3>Мои задачи:</h3>
     <ul>
-        {% for task in tasks %}
+        {% for task in tasks_without_project %}
             <li>
                 <a href="{% url 'task-detail' task.pk %}">{{ task.title }}</a> - {{ task.get_priority_display }} - {{ task.get_status_display }}
             </li>
         {% endfor %}
     </ul>
+
+    <h3>Задачи для проектов:</h3>
+    {% for project, tasks in projects_with_tasks.items %}
+        <h4>Задачи для проекта "{{ project.title }}":</h4>
+        <ul>
+            {% for task in tasks %}
+                <li>
+                    <a href="{% url 'task-detail' task.pk %}">{{ task.title }}</a> - {{ task.get_priority_display }} - {{ task.get_status_display }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% empty %}
+        <p>Нет задач для ваших проектов.</p>
+    {% endfor %}
 {% endblock %}

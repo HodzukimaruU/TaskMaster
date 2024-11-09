@@ -14,6 +14,9 @@
 
 <a href="{% url 'project-participants' project.id %}">Project participants</a>
 
+<!-- Ссылка на чат проекта -->
+<a href="{% url 'project-chat' project.id %}">Project Chat</a>
+
 <form method="get">
     <label>Status:</label>
     <select name="status">
@@ -31,6 +34,7 @@
     </select>
     <button type="submit">Filter</button>
 </form>
+
 <ul>
     {% for task in project.tasks.all %}
         <li>

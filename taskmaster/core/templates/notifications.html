@@ -5,10 +5,11 @@
 <ul>
     {% for invitation in invitations %}
         <li>
-            Invitation to the project {{ invitation.project.title }} <br>
-            Invited: {{ invitation.inviter.username }} <br>
-            Role: {{ invitation.get_role_display }}
-            <a href="{% url 'accept_invitation' invitation.id %}">Accept</a>
+            Invitation to the project "{{ invitation.project.title }}" <br>
+            Invited by: {{ invitation.inviter.username }} <br>
+            Role: {{ invitation.get_role_display }} <br>
+            <a href="{% url 'accept_invitation' invitation.id %}">Accept</a> | 
+            <a href="{% url 'reject_invitation' invitation.id %}">Reject</a>
         </li>
     {% endfor %}
 </ul>

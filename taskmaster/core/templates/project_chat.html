@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Chat for Project: {{ project.title }}</h2>
+
+<div id="chat">
+    {% for message in messages %}
+        <div class="message">
+            <strong>{{ message.user.username }}</strong>: {{ message.message }} <br>
+            <small>{{ message.created_at }}</small>
+        </div>
+    {% empty %}
+        <p>No messages yet.</p>
+    {% endfor %}
+</div>
+
+<form method="post">
+    {% csrf_token %}
+    <textarea name="message" rows="3" cols="50" placeholder="Type your message here..."></textarea><br>
+    <button type="submit">Send</button>
+</form>
+
+{% endblock %}

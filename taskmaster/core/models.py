@@ -78,3 +78,12 @@ class ConfirmationCode(BaseModel):
 
     def is_expired(self):
         return time.time() > self.expiration_time
+
+class ProjectChatMessage(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="chat_messages")
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Message by {self.user.username} on {self.created_at}"
