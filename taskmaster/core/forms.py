@@ -62,7 +62,7 @@ class TaskForm(forms.ModelForm):
         label="Проект",
     )
     assigned_to = forms.ModelChoiceField(
-        queryset=User.objects.none(),  # Изначально пустой, будет заполнен позже
+        queryset=User.objects.none(),
         required=False,
         label="Ответственный",
     )
@@ -76,7 +76,6 @@ class TaskForm(forms.ModelForm):
         hide_assigned = kwargs.pop('hide_assigned', False)
         super(TaskForm, self).__init__(*args, **kwargs)
         
-        # Скрываем поле assigned_to, если hide_assigned=True
         if hide_assigned:
             self.fields.pop('assigned_to')
         elif project:
@@ -84,14 +83,11 @@ class TaskForm(forms.ModelForm):
 
     def save(self, commit=True, user=None):
         task = super().save(commit=False)
-        # Если задача создается без проекта и ответственный не выбран, назначаем текущего пользователя
         if not task.project and not task.assigned_to:
             task.assigned_to = user
         if commit:
             task.save()
         return task
-
-
 
 class ProjectInvitationForm(forms.ModelForm):
     class Meta:
@@ -103,18 +99,3 @@ class ProjectInvitationForm(forms.ModelForm):
         labels = {
             'role': 'Role in the Project'
         }
-
-class ProjectSearchForm(forms.Form):
-    search_date = forms.DateField(
-        widget=forms.SelectDateWidget(years=range(2020, 2031)), 
-        required=False,
-        label="Поиск по дате"
-    )
-
-
-class TaskSearchForm(forms.Form):
-    search_date = forms.DateField(
-        widget=forms.SelectDateWidget(years=range(2020, 2031)),
-        required=False,
-        label="Поиск задач по дате"
-    )

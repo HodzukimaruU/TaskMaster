@@ -87,3 +87,11 @@ class ProjectChatMessage(models.Model):
 
     def __str__(self):
         return f"Message by {self.user.username} on {self.created_at}"
+    
+class TaskAssignmentNotification(models.Model):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='task_notifications')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Notification for {self.user.username} about task {self.task.title}"

@@ -13,4 +13,14 @@
         </li>
     {% endfor %}
 </ul>
+
+<h2>Task Assignments</h2>
+<ul>
+    {% for notification in task_notifications %}
+        <li>
+            You have been assigned to the task "{{ notification.task.title }}" in the project "{{ notification.task.project.title }}" <br>
+            <a href="{% url 'delete_task_notification' notification.id %}">Clear</a>
+        </li>
+    {% endfor %}
+</ul>
 {% endblock %}

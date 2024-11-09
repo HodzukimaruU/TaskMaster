@@ -14,7 +14,7 @@ from django.conf import settings
 from django.http import HttpResponseBadRequest, HttpResponse, HttpResponseForbidden, Http404
 from django.views.decorators.http import require_http_methods
 
-from .models import ConfirmationCode, Project, Task, ProjectInvitation, ProjectMembership, ProjectChatMessage
+from .models import ConfirmationCode, Project, Task, ProjectInvitation, ProjectMembership, ProjectChatMessage, TaskAssignmentNotification
 from .forms import RegistrationForm, ProjectForm, TaskForm, ProjectInvitationForm
 
 import uuid
@@ -264,6 +264,10 @@ def task_create(request):
             if project:
                 task.project = project
             task.save()
+
+            if task.project and task.assigned_to:
+                TaskAssignmentNotification.objects.create(task=task, user=task.assigned_to)
+
             return redirect('task-list')
 
     return render(request, 'task_form.html', {'form': form})
@@ -271,38 +275,49 @@ def task_create(request):
 @login_required
 def task_update(request, pk):
     task = get_object_or_404(Task, pk=pk)
-    
     hide_assigned = task.project is None
+    project = task.project
 
-    if request.user != task.owner and (task.project and get_user_role_in_project(request.user, task.project) != 'editor'):
-        raise PermissionDenied("У вас нет прав для редактирования этой задачи.")
+    if project:
+        role = get_user_role_in_project(request.user, project)
+        if role not in ['viewer', 'editor'] and request.user != project.owner:
+            raise PermissionDenied("У вас нет прав для редактирования этой задачи.")
+    else:
+        if request.user != task.owner:
+            raise PermissionDenied("У вас нет прав для редактирования этой задачи.")
 
-    form = TaskForm(instance=task, hide_assigned=hide_assigned)
+    form = TaskForm(instance=task, project=project, hide_assigned=hide_assigned)
 
     if request.method == 'POST':
-        form = TaskForm(request.POST, instance=task, hide_assigned=hide_assigned)
+        form = TaskForm(request.POST, instance=task, project=project, hide_assigned=hide_assigned)
         if form.is_valid():
-            form.save()
+            old_assigned_user = task.assigned_to
+            task = form.save()
+
+            if task.project and task.assigned_to:
+                TaskAssignmentNotification.objects.create(task=task, user=task.assigned_to)
+
             return redirect('task-detail', pk=task.pk)
 
     return render(request, 'task_form.html', {'form': form})
 
 
 
+@login_required
 def task_detail(request, pk):
     task = get_object_or_404(Task, pk=pk)
 
-    if task.assigned_to == request.user or task.owner == request.user:
-        has_access = True
-    elif task.project and task.project.members.filter(id=request.user.id).exists():
-        has_access = True
+    role = None
+
+    if task.project:
+        role = get_user_role_in_project(request.user, task.project)
+        if role not in ['viewer', 'editor'] and request.user != task.project.owner:
+            return HttpResponseForbidden("У вас нет доступа к этой задаче.")
     else:
-        has_access = False
+        if request.user != task.owner and request.user != task.assigned_to:
+            return HttpResponseForbidden("У вас нет доступа к этой задаче.")
 
-    if not has_access:
-        return HttpResponseForbidden("У вас нет доступа к этой задаче.")
-
-    return render(request, 'task_detail.html', {'task': task})
+    return render(request, 'task_detail.html', {'task': task, 'role': role})
 
 
 @login_required
@@ -319,14 +334,21 @@ def task_delete(request, pk):
         return redirect('task-list')
     return render(request, 'task_confirm_delete.html', {'task': task})
 
-
 #notifications
 @login_required
 def notifications(request):
     invitations = ProjectInvitation.objects.filter(invited_user=request.user, is_accepted=False)
-    user_projects = request.user.projects.all()
-    return render(request, 'notifications.html', {'invitations': invitations, 'projects': user_projects})
+    task_notifications = TaskAssignmentNotification.objects.filter(user=request.user)
+    return render(request, 'notifications.html', {
+        'invitations': invitations,
+        'task_notifications': task_notifications,
+    })
 
+@login_required
+def delete_task_notification(request, notification_id):
+    notification = get_object_or_404(TaskAssignmentNotification, id=notification_id, user=request.user)
+    notification.delete()
+    return redirect('notifications')
 
 #sent invite view
 @login_required
@@ -381,7 +403,6 @@ def send_invitation(request, project_id):
         'error_message': error_message,
     })
 
-
 @login_required
 def accept_invitation(request, invitation_id):
     invitation = get_object_or_404(ProjectInvitation, id=invitation_id, invited_user=request.user)
@@ -400,7 +421,6 @@ def reject_invitation(request, invitation_id):
         invitation.save()
 
     return redirect('notifications')
-
 
 @login_required
 def manage_participant(request, project_id, user_id):
