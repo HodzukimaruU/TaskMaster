@@ -1,23 +1,47 @@
-{% extends 'base.html' %}
-{% block content %}
-<h2>{{ task.title }}</h2>
-<p>{{ task.description }}</p>
-<p>Priority: {{ task.get_priority_display }}</p>
-<p>Status: {{ task.get_status_display }}</p>
-<p>Due Date: {{ task.due_date }}</p>
-<p><strong>Task Responsible:</strong> {{ task.assigned_to.username }}</p>
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>  
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+        <title>TaskMaster</title>
+        <link rel="stylesheet" href="{% static 'css/project_and_task_detail_and_task_list.css' %}">
+    </head>
 
-{% if task.owner == user %}
-    <a href="{% url 'task-update' task.pk %}">Edit Task</a>
-    <a href="{% url 'task-delete' task.pk %}">Delete Task</a>
-{% elif role == 'editor' %}
-    {% if task.project %}
-        <a href="{% url 'task-update' task.pk %}">Edit Task</a>
-        <a href="{% url 'task-delete' task.pk %}">Delete Task</a>
-    {% endif %}
-{% elif task.project and task.project.owner == user %}
-    <a href="{% url 'task-update' task.pk %}">Edit Task</a>
-    <a href="{% url 'task-delete' task.pk %}">Delete Task</a>
-{% endif %}
-
-{% endblock %}
+    <body>
+        <nav>
+            <a href="{% url 'index' %}">Profile</a>
+            <a href="{% url 'project-list' %}">My Projects</a>
+            <a href="{% url 'task-list' %}">My Tasks</a>
+            <a href="{% url 'notifications' %}">Notifications</a>
+            <a href="{% url 'logout' %}">Logout</a>
+        </nav>
+        <div class="project-detail">
+            <h2>{{ task.title }}</h2>
+            <p>{{ task.description }}</p>
+            <p>Priority: {{ task.get_priority_display }}</p>
+            <p>Status: {{ task.get_status_display }}</p>
+            <p>Due Date: {{ task.due_date }}</p>
+            <p><strong>Task Responsible:</strong> {{ task.assigned_to.username }}</p>
+            
+            {% if task.owner == user %}
+                <a href="{% url 'task-update' task.pk %}">Edit Task</a>
+                <a href="{% url 'task-delete' task.pk %}">Delete Task</a>
+            {% elif role == 'editor' %}
+                {% if task.project %}
+                    <a href="{% url 'task-update' task.pk %}">Edit Task</a>
+                    <a href="{% url 'task-delete' task.pk %}">Delete Task</a>
+                {% endif %}
+            {% elif task.project and task.project.owner == user %}
+                <a href="{% url 'task-update' task.pk %}">Edit Task</a>
+                <a href="{% url 'task-delete' task.pk %}">Delete Task</a>
+            {% endif %}
+        </div>
+        
+        <footer>
+            <div class="footer-content">
+                <p>&copy; 2024 TaskMaster. All rights reserved.</p>
+            </div>
+        </footer>
+    </body>
+</html>

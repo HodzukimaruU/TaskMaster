@@ -1,10 +1,33 @@
-{% extends 'base.html' %}
-{% block content %}
-<h2>Are you sure you want to delete this task?</h2>
-<p>{{ task.title }} - {{ task.get_priority_display }} - {{ task.get_status_display }}</p>
-<form method="POST">
-    {% csrf_token %}
-    <button type="submit">Yes, Delete</button>
-</form>
-<a href="{% url 'task-list' %}">Cancel</a>
-{% endblock %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>  
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+        <title>TaskMaster</title>
+        <link rel="stylesheet" href="{% static 'css/project_and_task_confirm_delete.css' %}">
+    </head>
+
+    <body>
+        <nav>
+            <a href="{% url 'index' %}">Profile</a>
+            <a href="{% url 'project-list' %}">My Projects</a>
+            <a href="{% url 'task-list' %}">My Tasks</a>
+            <a href="{% url 'notifications' %}">Notifications</a>
+            <a href="{% url 'logout' %}">Logout</a>
+        </nav>
+        <h2>Are you sure you want to delete this task?</h2>
+        <p>{{ task.title }} - {{ task.get_priority_display }} - {{ task.get_status_display }}</p>
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit">Yes, Delete</button>
+        </form>
+        <a href="{% url 'task-list' %}">Cancel</a>
+        <footer>
+            <div class="footer-content">
+                <p>&copy; 2024 TaskMaster. All rights reserved.</p>
+            </div>
+        </footer>
+    </body>
+</html>
+

@@ -17,7 +17,7 @@ def send_invitation_view(request: HttpRequest, project_id: int) -> HttpResponse:
     if search_query:
         selected_user = User.objects.filter(username=search_query).first()
         if not selected_user:
-            error_message = "Пользователь не найден"
+            error_message = "User not found"
 
     if request.method == 'POST':
         selected_username = request.POST.get("selected_user")
@@ -41,7 +41,7 @@ def send_invitation_view(request: HttpRequest, project_id: int) -> HttpResponse:
                 invitation.invited_user = invited_user
                 invitation.save()
 
-                success_message = f"Приглашение отправлено пользователю {invited_user.username}."
+                success_message = f"An invitation has been sent to the user {invited_user.username}."
                 return render(request, 'send_invitation.html', {
                     'project': project,
                     'search_query': search_query,
@@ -49,7 +49,7 @@ def send_invitation_view(request: HttpRequest, project_id: int) -> HttpResponse:
                     'success_message': success_message,
                 })
             else:
-                error_message = "Ошибка при отправке приглашения."
+                error_message = "Error sending invitation."
 
     return render(request, 'send_invitation.html', {
         'form': ProjectInvitationForm(),

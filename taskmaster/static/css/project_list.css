@@ -1,0 +1,103 @@
+@import url('style.css');
+
+.projects-container {
+    padding-right: 10%;
+    padding-bottom: 10%;
+    padding-left: 10%;
+    padding-top: 10px;
+    margin-left: 1px;
+    margin-right: 1px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    background-color: #fff;
+    text-align: center;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: 'Arial', sans-serif;
+}
+
+.projects-container h2 {
+    font-size: 32px;
+    color: #7420d5;
+    margin-bottom: 20px;
+}
+
+.create-project-btn {
+    margin-bottom: 20px;
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 50px;
+}
+
+.create-project-btn .btn {
+    background-color: #7420d5;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.create-project-btn .btn:hover {
+    background-color: #5b0fb2;
+}
+
+/* Список проектов */
+.projects-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.projects-list .project-item {
+    background-color: #f4f4f9;
+    margin-bottom: 15px;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.projects-list .project-item:hover {
+    transform: translateY(-5px);
+    background-color: #e9e9f5;
+}
+
+/* Ссылки на проекты */
+.project-link {
+    font-size: 18px;
+    color: #7420d5;
+    text-decoration: none;
+}
+
+.project-link:hover {
+    text-decoration: underline;
+}
+
+.no-projects-message {
+    font-size: 18px;
+    color: #555;
+    text-align: center;
+    margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+    .projects-container {
+        margin: 20px;
+        padding: 15px;
+    }
+
+    .projects-container h2 {
+        font-size: 28px;
+    }
+
+    .projects-list .project-item {
+        font-size: 16px;
+        padding: 10px;
+    }
+
+    .create-project-btn .btn {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
+}

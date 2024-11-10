@@ -1,0 +1,119 @@
+@import url('style.css');
+
+h2 {
+    font-size: 26px;
+    color: #7420d5;
+    text-align: center;
+    margin: 20px 0;
+}
+
+#chat {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    max-height: 400px;
+}
+
+/* Сообщение в чате */
+.message {
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: #f4f4f9;
+    border-radius: 8px;
+    border-left: 4px solid #7420d5;
+}
+
+.message strong {
+    color: #7420d5;
+}
+
+.message small {
+    display: block;
+    font-size: 12px;
+    color: #777;
+    margin-top: 5px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+form textarea {
+    width: 80%;
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+    resize: none;
+    min-height: 80px;
+}
+
+form button {
+    padding: 10px 20px;
+    background-color: #7420d5;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+form button:hover {
+    background-color: #5b0fb2;
+}
+
+nav {
+    background-color: #7420d5;
+    padding: 20px;
+    text-align: center;
+    border-radius: 0 0 4px 4px;
+}
+
+nav a {
+    color: #fff;
+    padding: 10px 20px;
+    text-decoration: none;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+nav a:hover {
+    background-color: #5b0fb2;
+    border-radius: 4px;
+}
+
+@media (max-width: 768px) {
+    #chat {
+        width: 100%;
+        max-width: none;
+        padding: 10px;
+    }
+
+    form textarea {
+        width: 100%;
+        padding: 8px;
+    }
+
+    form button {
+        width: 100%;
+        padding: 12px;
+    }
+
+    nav {
+        padding: 10px;
+    }
+
+    nav a {
+        padding: 12px 15px;
+        font-size: 14px;
+    }
+}

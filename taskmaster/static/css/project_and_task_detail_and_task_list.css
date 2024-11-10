@@ -1,0 +1,108 @@
+@import url('style.css');
+
+.project-detail {
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+.project-detail h2 {
+    font-size: 28px;
+    color: #7420d5;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.project-detail p {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+.project-detail a {
+    display: inline-block;
+    padding: 12px 20px;
+    margin: 10px 0;
+    background-color: #7420d5;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.project-detail a:hover {
+    background-color: #5b0fb2;
+}
+
+.project-detail form {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 40;
+}
+
+.project-detail form label {
+    font-size: 16px;
+    margin-right: 10px;
+}
+
+.project-detail form select, .project-detail form button {
+    padding: 8px 15px;
+    font-size: 14px;
+    margin-top: 10px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.project-detail form button {
+    background-color: #7420d5;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.project-detail form button:hover {
+    background-color: #5b0fb2;
+}
+
+.project-detail ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.project-detail li {
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+    font-size: 16px;
+    color: #333;
+}
+
+.project-detail li a {
+    text-decoration: none;
+    color: white;
+}
+
+.project-detail li a:hover {
+    text-decoration: underline;
+}
+
+.project-detail footer {
+    background-color: #7420d5;
+    padding: 15px;
+    text-align: center;
+    margin-top: 30px;
+    border-radius: 0 0 8px 8px;
+}
+
+.project-detail footer p {
+    color: #fff;
+    font-size: 14px;
+    margin: 0;
+}

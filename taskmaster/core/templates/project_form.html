@@ -1,15 +1,38 @@
-{% extends 'base.html' %}
-{% block content %}
-    <h2>
-        {% if form.instance.pk %}
-            {{ form.instance.title }}
-        {% else %}
-            Create New Project
-        {% endif %}
-    </h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Save Project</button>
-    </form>
-{% endblock %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>  
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+        <title>TaskMaster</title>
+        <link rel="stylesheet" href="{% static 'css/project_form.css' %}">
+    </head>
+
+    <body>
+        <nav>
+            <a href="{% url 'index' %}">Profile</a>
+            <a href="{% url 'project-list' %}">My Projects</a>
+            <a href="{% url 'task-list' %}">My Tasks</a>
+            <a href="{% url 'notifications' %}">Notifications</a>
+            <a href="{% url 'logout' %}">Logout</a>
+        </nav>
+        <h2>
+            {% if form.instance.pk %}
+                {{ form.instance.title }}
+            {% else %}
+                Create New Project
+            {% endif %}
+        </h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Save Project</button>
+        </form>
+        <footer>
+            <div class="footer-content">
+                <p>&copy; 2024 TaskMaster. All rights reserved.</p>
+            </div>
+        </footer>
+    </body>
+</html>
+

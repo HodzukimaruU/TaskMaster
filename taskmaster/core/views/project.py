@@ -41,6 +41,14 @@ def project_detail(request: HttpRequest, pk: int) -> HttpResponse:
 
     role = get_user_role_in_project(request.user, project)
     tasks = project.tasks.all()
+
+    status = request.GET.get("status")
+    priority = request.GET.get("priority")
+    
+    if status:
+        tasks = tasks.filter(status=status)
+    if priority:
+        tasks = tasks.filter(priority=priority)
     is_owner = request.user == project.owner
     
     return render(request, 'project_detail.html', {

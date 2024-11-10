@@ -26,7 +26,7 @@ class ProjectForm(forms.ModelForm):
         max_length=500,
         required=False,
         label="Project description",
-        widget=forms.Textarea(attrs={'placeholder': 'Enter a description'}),
+        widget=forms.Textarea(attrs={'placeholder': 'Enter a description', 'class': 'no-resize'}),
     )
 
     class Meta:
@@ -42,7 +42,7 @@ class TaskForm(forms.ModelForm):
     description = forms.CharField(
         required=False,
         label="Description of the task",
-        widget=forms.Textarea(attrs={'placeholder': 'Enter a description'}),
+        widget=forms.Textarea(attrs={'placeholder': 'Enter a description', 'class': 'no-resize'}),
     )
     due_date = forms.DateTimeField(
         label="Due date",

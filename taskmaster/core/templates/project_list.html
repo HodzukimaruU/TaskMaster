@@ -1,18 +1,41 @@
-{% extends 'base.html' %}
-{% block content %}
-    <div class="projects-container">
-        <h2>My Projects</h2>
-        <div class="create-project-btn">
-            <a href="{% url 'project-create' %}" class="btn">Create New Project</a>
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>  
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+        <title>TaskMaster</title>
+        <link rel="stylesheet" href="{% static 'css/project_list.css' %}">
+    </head>
+
+    <body>
+        <nav>
+            <a href="{% url 'index' %}">Profile</a>
+            <a href="{% url 'project-list' %}">My Projects</a>
+            <a href="{% url 'task-list' %}">My Tasks</a>
+            <a href="{% url 'notifications' %}">Notifications</a>
+            <a href="{% url 'logout' %}">Logout</a>
+        </nav>
+        <div class="projects-container">
+            <h2>My Projects</h2>
+            <div class="create-project-btn">
+                <a href="{% url 'project-create' %}" class="btn">Create New Project</a>
+            </div>
+            <ul class="projects-list">
+                {% for project in projects %}
+                    <li class="project-item">
+                        <a href="{% url 'project-detail' project.id %}" class="project-link">{{ project.title }}</a>
+                    </li>
+                {% empty %}
+                    <p class="no-projects-message">You don't have any projects yet.</p>
+                {% endfor %}
+            </ul>
         </div>
-        <ul class="projects-list">
-            {% for project in projects %}
-                <li class="project-item">
-                    <a href="{% url 'project-detail' project.id %}" class="project-link">{{ project.title }}</a>
-                </li>
-            {% empty %}
-                <p class="no-projects-message">You don't have any projects yet.</p>
-            {% endfor %}
-        </ul>
-    </div>
-{% endblock %}
+        <footer>
+            <div class="footer-content">
+                <p>&copy; 2024 TaskMaster. All rights reserved.</p>
+            </div>
+        </footer>
+    </body>
+</html>
+

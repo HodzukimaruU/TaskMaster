@@ -1,37 +1,59 @@
-{% extends 'base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>  
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+        <title>TaskMaster</title>
+        <link rel="stylesheet" href="{% static 'css/project_participants.css' %}">
+    </head>
 
-{% block content %}
-<h2>Project participants: {{ project.title }}</h2>
+    <body>
+        <nav>
+            <a href="{% url 'index' %}">Profile</a>
+            <a href="{% url 'project-list' %}">My Projects</a>
+            <a href="{% url 'task-list' %}">My Tasks</a>
+            <a href="{% url 'notifications' %}">Notifications</a>
+            <a href="{% url 'logout' %}">Logout</a>
+        </nav>
+        <h2>Project participants: {{ project.title }}</h2>
 
-<ul>
-    {% for membership in participants %}
-        <li>{{ membership.user.username }} - 
-            {% if membership.role == 'owner' %}
-                Owner
-            {% else %}
-                {{ membership.get_role_display }}
-            {% endif %}
+        <ul>
+            {% for membership in participants %}
+                <li>{{ membership.user.username }} - 
+                    {% if membership.role == 'owner' %}
+                        Owner
+                    {% else %}
+                        {{ membership.get_role_display }}
+                    {% endif %}
+        
+                    {% if project.owner == request.user and membership.role != 'owner' %}
+                        <!-- Форма для изменения роли -->
+                        <form method="post" action="{% url 'manage_participant' project.id membership.user.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <select name="new_role">
+                                <option value="viewer" {% if membership.role == 'viewer' %}selected{% endif %}>Viewer</option>
+                                <option value="editor" {% if membership.role == 'editor' %}selected{% endif %}>Editor</option>
+                            </select>
+                            <button type="submit" name="action" value="change_role">Change role</button>
+                        </form>
+        
+                        <form method="post" action="{% url 'manage_participant' project.id membership.user.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" name="action" value="remove" onclick="return confirm('Remove a member from a project?');">Delete</button>
+                        </form>
+                    {% endif %}
+                </li>
+            {% empty %}
+                <p>There are no participants in this project.</p>
+            {% endfor %}
+        </ul>
+        
+        <footer>
+            <div class="footer-content">
+                <p>&copy; 2024 TaskMaster. All rights reserved.</p>
+            </div>
+        </footer>
+    </body>
+</html>
 
-            {% if project.owner == request.user and membership.role != 'owner' %}
-                <!-- Форма для изменения роли -->
-                <form method="post" action="{% url 'manage_participant' project.id membership.user.id %}" style="display:inline;">
-                    {% csrf_token %}
-                    <select name="new_role">
-                        <option value="viewer" {% if membership.role == 'viewer' %}selected{% endif %}>Viewer</option>
-                        <option value="editor" {% if membership.role == 'editor' %}selected{% endif %}>Editor</option>
-                    </select>
-                    <button type="submit" name="action" value="change_role">Change role</button>
-                </form>
-
-                <form method="post" action="{% url 'manage_participant' project.id membership.user.id %}" style="display:inline;">
-                    {% csrf_token %}
-                    <button type="submit" name="action" value="remove" onclick="return confirm('Remove a member from a project?');">Delete</button>
-                </form>
-            {% endif %}
-        </li>
-    {% empty %}
-        <p>There are no participants in this project.</p>
-    {% endfor %}
-</ul>
-
-{% endblock %}

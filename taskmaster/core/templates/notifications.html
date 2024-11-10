@@ -1,26 +1,47 @@
-{% extends 'base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>  
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+        <title>TaskMaster</title>
+        <link rel="stylesheet" href="{% static 'css/notifications.css' %}">
+    </head>
 
-{% block content %}
-<h2>Invitations</h2>
-<ul>
-    {% for invitation in invitations %}
-        <li>
-            Invitation to the project "{{ invitation.project.title }}" <br>
-            Invited by: {{ invitation.inviter.username }} <br>
-            Role: {{ invitation.get_role_display }} <br>
-            <a href="{% url 'accept_invitation' invitation.id %}">Accept</a> | 
-            <a href="{% url 'reject_invitation' invitation.id %}">Reject</a>
-        </li>
-    {% endfor %}
-</ul>
-
-<h2>Task Assignments</h2>
-<ul>
-    {% for notification in task_notifications %}
-        <li>
-            You have been assigned to the task "{{ notification.task.title }}" in the project "{{ notification.task.project.title }}" <br>
-            <a href="{% url 'delete_task_notification' notification.id %}">Clear</a>
-        </li>
-    {% endfor %}
-</ul>
-{% endblock %}
+    <body>
+        <nav>
+            <a href="{% url 'index' %}">Profile</a>
+            <a href="{% url 'project-list' %}">My Projects</a>
+            <a href="{% url 'task-list' %}">My Tasks</a>
+            <a href="{% url 'notifications' %}">Notifications</a>
+            <a href="{% url 'logout' %}">Logout</a>
+        </nav>
+        <h2>Invitations</h2>
+        <ul>
+            {% for invitation in invitations %}
+                <li>
+                    Invitation to the project "{{ invitation.project.title }}" <br>
+                    Invited by: {{ invitation.inviter.username }} <br>
+                    Role: {{ invitation.get_role_display }} <br>
+                    <a href="{% url 'accept_invitation' invitation.id %}">Accept</a> | 
+                    <a href="{% url 'reject_invitation' invitation.id %}">Reject</a>
+                </li>
+            {% endfor %}
+        </ul>
+        <hr>
+        <h2>Task Assignments</h2>
+        <ul>
+            {% for notification in task_notifications %}
+                <li>
+                    You have been assigned to the task "{{ notification.task.title }}" in the project "{{ notification.task.project.title }}" <br>
+                    <a href="{% url 'delete_task_notification' notification.id %}">Clear</a>
+                </li>
+            {% endfor %}
+        </ul>
+        <footer>
+            <div class="footer-content">
+                <p>&copy; 2024 TaskMaster. All rights reserved.</p>
+            </div>
+        </footer>
+    </body>
+</html>

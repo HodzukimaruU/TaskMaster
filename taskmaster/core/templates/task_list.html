@@ -1,46 +1,71 @@
-{% extends 'base.html' %}
-{% block content %}
-    <h2>My Tasks</h2>
-    <a href="{% url 'task-create' %}">Create New Task</a>
-    
-    <form method="get">
-        <label>Status:</label>
-        <select name="status">
-            <option value="">All</option>
-            <option value="todo">To Do</option>
-            <option value="in_progress">In Progress</option>
-            <option value="done">Done</option>
-        </select>
-        <label>Priority:</label>
-        <select name="priority">
-            <option value="">All</option>
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-        </select>
-        <button type="submit">Filter</button>
-    </form>
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>  
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+        <title>TaskMaster</title>
+        <link rel="stylesheet" href="{% static 'css/project_and_task_detail_and_task_list.css' %}">
+    </head>
 
-    <h3>Task tasks just for you:</h3>
-    <ul>
-        {% for task in tasks_without_project %}
-            <li>
-                <a href="{% url 'task-detail' task.pk %}">{{ task.title }}</a> - {{ task.get_priority_display }} - {{ task.get_status_display }}
-            </li>
-        {% endfor %}
-    </ul>
-
-    <h3>Project tasks:</h3>
-    {% for project, tasks in projects_with_tasks.items %}
-        <h4>Tasks for the project "{{ project.title }}":</h4>
-        <ul>
-            {% for task in tasks %}
-                <li>
-                    <a href="{% url 'task-detail' task.pk %}">{{ task.title }}</a> - {{ task.get_priority_display }} - {{ task.get_status_display }}
-                </li>
+    <body>
+        <nav>
+            <a href="{% url 'index' %}">Profile</a>
+            <a href="{% url 'project-list' %}">My Projects</a>
+            <a href="{% url 'task-list' %}">My Tasks</a>
+            <a href="{% url 'notifications' %}">Notifications</a>
+            <a href="{% url 'logout' %}">Logout</a>
+        </nav>
+        <div class="project-detail">
+            <h2>My Tasks</h2>
+            <a href="{% url 'task-create' %}">Create New Task</a>
+            
+            <form method="get">
+                <label>Status:</label>
+                <select name="status">
+                    <option value="">All</option>
+                    <option value="todo">To Do</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="done">Done</option>
+                </select>
+                <label>Priority:</label>
+                <select name="priority">
+                    <option value="">All</option>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                </select>
+                <button type="submit">Filter</button>
+            </form>
+        
+            <h3>Tasks only for you:</h3>
+            <ul>
+                {% for task in tasks_without_project %}
+                    <li>
+                        <a href="{% url 'task-detail' task.pk %}">{{ task.title }}</a> - {{ task.get_priority_display }} - {{ task.get_status_display }}
+                    </li>
+                {% endfor %}
+            </ul>
+        
+            <h3>Project tasks:</h3>
+            {% for project, tasks in projects_with_tasks.items %}
+                <h4>Tasks for the project "{{ project.title }}":</h4>
+                <ul>
+                    {% for task in tasks %}
+                        <li>
+                            <a href="{% url 'task-detail' task.pk %}">{{ task.title }}</a> - {{ task.get_priority_display }} - {{ task.get_status_display }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% empty %}
+                <p>No tasks for your projects.</p>
             {% endfor %}
-        </ul>
-    {% empty %}
-        <p>No tasks for your projects.</p>
-    {% endfor %}
-{% endblock %}
+        </div>
+        <footer>
+            <div class="footer-content">
+                <p>&copy; 2024 TaskMaster. All rights reserved.</p>
+            </div>
+        </footer>
+    </body>
+</html>
+

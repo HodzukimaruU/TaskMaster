@@ -1,35 +1,57 @@
-{% extends 'base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>  
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+        <title>TaskMaster</title>
+        <link rel="stylesheet" href="{% static 'css/send_invitation.css' %}">
+    </head>
 
-{% block content %}
-<h2>Send an invitation to the project: {{ project.title }}</h2>
+    <body>
+        <nav>
+            <a href="{% url 'index' %}">Profile</a>
+            <a href="{% url 'project-list' %}">My Projects</a>
+            <a href="{% url 'task-list' %}">My Tasks</a>
+            <a href="{% url 'notifications' %}">Notifications</a>
+            <a href="{% url 'logout' %}">Logout</a>
+        </nav>
+        <h2>Send an invitation to the project: {{ project.title }}</h2>
 
-{% if self_invitation_error %}
-    <div class="alert alert-danger">
-        You cannot send an invitation to yourself.
-    </div>
-{% endif %}
+        {% if self_invitation_error %}
+            <div class="alert alert-danger">
+                You cannot send an invitation to yourself.
+            </div>
+        {% endif %}
+        
+        {% if success_message %}
+            <div class="alert alert-success">
+                <p>{{ success_message }}</p>
+            </div>
+        {% endif %}
+        
+        <form method="get" action=".">
+            <input type="text" name="search_user" placeholder="Введите имя пользователя" value="{{ search_query }}">
+            <button type="submit">Search</button>
+        </form>
+        
+        {% if selected_user %}
+            <form method="post" action=".">
+                {% csrf_token %}
+                <p>User found: {{ selected_user.username }}</p>
+                <input type="hidden" name="selected_user" value="{{ selected_user.username }}">
+                {{ form.as_p }}
+                <button type="submit">Send an invitation</button>
+            </form>
+        {% elif search_query %}
+            <p>{{ error_message }}</p>
+        {% endif %}
+        <a href="{% url 'project-detail' project.id %}">Back to project</a>
+        <footer>
+            <div class="footer-content">
+                <p>&copy; 2024 TaskMaster. All rights reserved.</p>
+            </div>
+        </footer>
+    </body>
+</html>
 
-{% if success_message %}
-    <div class="alert alert-success">
-        <p>{{ success_message }}</p>
-    </div>
-{% endif %}
-
-<form method="get" action=".">
-    <input type="text" name="search_user" placeholder="Введите имя пользователя" value="{{ search_query }}">
-    <button type="submit">Search</button>
-</form>
-
-{% if selected_user %}
-    <form method="post" action=".">
-        {% csrf_token %}
-        <p>User found: {{ selected_user.username }}</p>
-        <input type="hidden" name="selected_user" value="{{ selected_user.username }}">
-        {{ form.as_p }}
-        <button type="submit">Send an invitation</button>
-    </form>
-{% elif search_query %}
-    <p>{{ error_message }}</p>
-{% endif %}
-<a href="{% url 'project-detail' project.id %}">Back to project</a>
-{% endblock %}

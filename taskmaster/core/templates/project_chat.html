@@ -1,23 +1,44 @@
-{% extends 'base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>  
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+        <title>TaskMaster</title>
+        <link rel="stylesheet" href="{% static 'css/chat.css' %}">
+    </head>
 
-{% block content %}
-<h2>Chat for Project: {{ project.title }}</h2>
+    <body>
+        <nav>
+            <a href="{% url 'index' %}">Profile</a>
+            <a href="{% url 'project-list' %}">My Projects</a>
+            <a href="{% url 'task-list' %}">My Tasks</a>
+            <a href="{% url 'notifications' %}">Notifications</a>
+            <a href="{% url 'logout' %}">Logout</a>
+        </nav>
+        <h2>Chat for Project: {{ project.title }}</h2>
 
-<div id="chat">
-    {% for message in messages %}
-        <div class="message">
-            <strong>{{ message.user.username }}</strong>: {{ message.message }} <br>
-            <small>{{ message.created_at }}</small>
+        <div id="chat">
+            {% for message in messages %}
+                <div class="message">
+                    <strong>{{ message.user.username }}</strong>: {{ message.message }} <br>
+                    <small>{{ message.created_at }}</small>
+                </div>
+            {% empty %}
+                <p>No messages yet.</p>
+            {% endfor %}
         </div>
-    {% empty %}
-        <p>No messages yet.</p>
-    {% endfor %}
-</div>
-
-<form method="post">
-    {% csrf_token %}
-    <textarea name="message" rows="3" cols="50" placeholder="Type your message here..."></textarea><br>
-    <button type="submit">Send</button>
-</form>
-
-{% endblock %}
+        
+        <form method="post">
+            {% csrf_token %}
+            <textarea name="message" rows="3" cols="50" placeholder="Type your message here..."></textarea><br>
+            <button type="submit">Send</button>
+        </form>
+        
+        <footer>
+            <div class="footer-content">
+                <p>&copy; 2024 TaskMaster. All rights reserved.</p>
+            </div>
+        </footer>
+    </body>
+</html>
