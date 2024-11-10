@@ -8,7 +8,7 @@
             <a href="{% url 'project-detail' project.id %}">{{ project.title }}</a>
         </li>
     {% empty %}
-        <p>У вас пока нет проектов.</p>
+        <p>You don't have any projects yet.</p>
     {% endfor %}
 </ul>
 {% endblock %}

@@ -1,16 +1,14 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Отправить приглашение в проект: {{ project.title }}</h2>
+<h2>Send an invitation to the project: {{ project.title }}</h2>
 
-<!-- Вывод ошибки, если пользователь пытается отправить приглашение самому себе -->
 {% if self_invitation_error %}
     <div class="alert alert-danger">
-        Вы не можете отправить приглашение самому себе.
+        You cannot send an invitation to yourself.
     </div>
 {% endif %}
 
-<!-- Вывод успешного сообщения, если приглашение было отправлено -->
 {% if success_message %}
     <div class="alert alert-success">
         <p>{{ success_message }}</p>
@@ -19,19 +17,19 @@
 
 <form method="get" action=".">
     <input type="text" name="search_user" placeholder="Введите имя пользователя" value="{{ search_query }}">
-    <button type="submit">Поиск</button>
+    <button type="submit">Search</button>
 </form>
 
 {% if selected_user %}
     <form method="post" action=".">
         {% csrf_token %}
-        <p>Пользователь найден: {{ selected_user.username }}</p>
+        <p>User found: {{ selected_user.username }}</p>
         <input type="hidden" name="selected_user" value="{{ selected_user.username }}">
         {{ form.as_p }}
-        <button type="submit">Отправить приглашение</button>
+        <button type="submit">Send an invitation</button>
     </form>
 {% elif search_query %}
     <p>{{ error_message }}</p>
 {% endif %}
-<a href="{% url 'project-detail' project.id %}">Назад к проекту</a>
+<a href="{% url 'project-detail' project.id %}">Back to project</a>
 {% endblock %}

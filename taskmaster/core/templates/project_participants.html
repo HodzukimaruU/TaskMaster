@@ -23,7 +23,6 @@
                     <button type="submit" name="action" value="change_role">Change role</button>
                 </form>
 
-                <!-- Форма для удаления участника -->
                 <form method="post" action="{% url 'manage_participant' project.id membership.user.id %}" style="display:inline;">
                     {% csrf_token %}
                     <button type="submit" name="action" value="remove" onclick="return confirm('Remove a member from a project?');">Delete</button>
@@ -31,7 +30,7 @@
             {% endif %}
         </li>
     {% empty %}
-        <p>В этом проекте нет участников.</p>
+        <p>There are no participants in this project.</p>
     {% endfor %}
 </ul>
 

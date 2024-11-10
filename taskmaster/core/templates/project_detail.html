@@ -41,7 +41,7 @@
             <a href="{% url 'task-detail' task.pk %}">{{ task.title }}</a> - {{ task.get_status_display }}
         </li>
     {% empty %}
-        <p>В этом проекте пока нет задач.</p>
+        <p>There are no tasks in this project yet.</p>
     {% endfor %}
 </ul>
 

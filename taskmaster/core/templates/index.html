@@ -1,7 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Home</h1>
-    <p>Мы рады видеть вас в TaskMaster — вашем инструменте для управления задачами и проектами в команде.</p>
-
+<h1>Profile</h1>
+    <p><strong>User:</strong> {{ user.username }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>First Name:</strong> {{ user.first_name }}</p>
+    <p><strong>Last Name:</strong> {{ user.last_name }}</p>
+<h2>We are glad to see you in TaskMaster - your tool for managing tasks and projects in a team.</h2>
 {% endblock %}

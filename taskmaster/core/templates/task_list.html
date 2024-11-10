@@ -21,7 +21,7 @@
         <button type="submit">Filter</button>
     </form>
 
-    <h3>Мои задачи:</h3>
+    <h3>Task tasks just for you:</h3>
     <ul>
         {% for task in tasks_without_project %}
             <li>
@@ -30,9 +30,9 @@
         {% endfor %}
     </ul>
 
-    <h3>Задачи для проектов:</h3>
+    <h3>Project tasks:</h3>
     {% for project, tasks in projects_with_tasks.items %}
-        <h4>Задачи для проекта "{{ project.title }}":</h4>
+        <h4>Tasks for the project "{{ project.title }}":</h4>
         <ul>
             {% for task in tasks %}
                 <li>
@@ -41,6 +41,6 @@
             {% endfor %}
         </ul>
     {% empty %}
-        <p>Нет задач для ваших проектов.</p>
+        <p>No tasks for your projects.</p>
     {% endfor %}
 {% endblock %}

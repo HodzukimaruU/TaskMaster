@@ -19,14 +19,14 @@ class RegistrationForm(UserCreationForm):
 class ProjectForm(forms.ModelForm):
     title = forms.CharField(
         max_length=100,
-        label="Название проекта",
-        widget=forms.TextInput(attrs={'placeholder': 'Введите название проекта'}),
+        label="Project name",
+        widget=forms.TextInput(attrs={'placeholder': 'Enter project name'}),
     )
     description = forms.CharField(
         max_length=500,
         required=False,
-        label="Описание проекта",
-        widget=forms.Textarea(attrs={'placeholder': 'Введите описание'}),
+        label="Project description",
+        widget=forms.Textarea(attrs={'placeholder': 'Enter a description'}),
     )
 
     class Meta:
@@ -36,35 +36,35 @@ class ProjectForm(forms.ModelForm):
 class TaskForm(forms.ModelForm):
     title = forms.CharField(
         max_length=100,
-        label="Название задачи",
-        widget=forms.TextInput(attrs={'placeholder': 'Введите название задачи'}),
+        label="Task name",
+        widget=forms.TextInput(attrs={'placeholder': 'Enter a task name'}),
     )
     description = forms.CharField(
         required=False,
-        label="Описание задачи",
-        widget=forms.Textarea(attrs={'placeholder': 'Введите описание'}),
+        label="Description of the task",
+        widget=forms.Textarea(attrs={'placeholder': 'Enter a description'}),
     )
     due_date = forms.DateTimeField(
-        label="Срок выполнения",
+        label="Due date",
         widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}),
     )
     priority = forms.ChoiceField(
         choices=Task.PRIORITY_CHOICES,
-        label="Приоритет",
+        label="Priority",
     )
     status = forms.ChoiceField(
         choices=Task.STATUS_CHOICES,
-        label="Статус",
+        label="Status",
     )
     project = forms.ModelChoiceField(
         queryset=Project.objects.all(),
         required=False,
-        label="Проект",
+        label="Project",
     )
     assigned_to = forms.ModelChoiceField(
         queryset=User.objects.none(),
         required=False,
-        label="Ответственный",
+        label="Responsible",
     )
 
     class Meta:
@@ -78,6 +78,7 @@ class TaskForm(forms.ModelForm):
         
         if hide_assigned:
             self.fields.pop('assigned_to')
+            self.fields.pop('project')
         elif project:
             self.fields['assigned_to'].queryset = project.members.all()
 
