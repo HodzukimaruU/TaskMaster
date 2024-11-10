@@ -1,0 +1,281 @@
+/* Основной стиль */
+body {
+    font-family: 'Arial', sans-serif; /* Мягкий шрифт */
+    background-color: #f4f4f9; /* Светлый фон */
+    margin: 0;
+    padding: 0;
+    color: #333; /* Темный цвет для текста */
+}
+
+/* Шапка профиля (например, для навигации или header) */
+header {
+    background-color: #7420d5; /* Бирюзовый цвет для шапки */
+    padding: 20px;
+    text-align: center;
+    color: #fff; /* Белый текст */
+    font-size: 24px;
+    border-radius: 0 0 4px 4px; /* Скругленные нижние углы */
+}
+
+header a {
+    color: #fff; /* Белые ссылки */
+    text-decoration: none;
+    font-size: 18px;
+    padding: 8px 15px;
+    margin: 0 10px;
+    transition: background-color 0.3s; /* Плавный переход */
+}
+
+header a:hover {
+    background-color: #5b0fb2; /* Темный бирюзовый при наведении */
+}
+
+/* Навигация */
+nav {
+    background-color: #7420d5; /* Синий цвет для фона */
+    padding: 20px;
+    text-align: center;
+    border-radius: 0 0 4px 4px; /* Скругленные нижние углы */
+}
+
+nav a {
+    color: #fff; /* Белый текст */
+    padding: 10px 20px;
+    text-decoration: none;
+    font-size: 16px;
+    transition: background-color 0.3s; /* Плавный переход */
+}
+
+nav a:hover {
+    background-color: #5b0fb2; /* Темный синий при наведении */
+    border-radius: 4px;
+}
+
+/* Медиазапрос для мобильных устройств */
+@media (max-width: 768px) {
+    body {
+        font-size: 14px; /* Уменьшение шрифта на мобильных устройствах */
+    }
+    
+    nav {
+        text-align: center;
+    }
+    
+    nav a {
+        display: block;
+        padding: 15px;
+    }
+
+    .container {
+        width: 100%;
+        padding: 10px;
+    }
+}
+
+/* Футер (уменьшаем высоту) */
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+}
+
+footer {
+    margin-top: auto; /* Это гарантирует, что футер будет внизу */
+}
+
+/* Чтобы футер всегда оставался внизу */
+html, body {
+    height: 100%;
+}
+html, body {
+    overflow-x: hidden; /* Скрыть горизонтальную прокрутку */
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+/* profile.css */
+
+/* Profile page container */
+.profile-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: 'Arial', sans-serif;
+}
+
+/* Profile header */
+.profile-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.profile-header h1 {
+    color: #7420d5; /* Purple color for the title */
+    font-size: 36px;
+    margin-bottom: 10px;
+}
+
+.profile-header .intro-text {
+    font-size: 18px;
+    color: #555;
+}
+
+/* User information section */
+.profile-info h2 {
+    font-size: 24px;
+    color: #7420d5;
+    margin-bottom: 15px;
+}
+
+.profile-info ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.profile-info li {
+    font-size: 18px;
+    margin-bottom: 10px;
+    background-color: #f4f4f9; /* Light background for each item */
+    padding: 10px;
+    border-radius: 5px; /* Rounded corners for each info item */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Light shadow */
+}
+
+.profile-info strong {
+    color: #7420d5; /* Purple color for labels */
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .profile-container {
+        margin: 20px;
+        padding: 15px;
+    }
+
+    .profile-header h1 {
+        font-size: 28px;
+    }
+
+    .profile-header .intro-text {
+        font-size: 16px;
+    }
+
+    .profile-info h2 {
+        font-size: 20px;
+    }
+
+    .profile-info li {
+        font-size: 16px;
+    }
+}
+
+/* Стиль для контейнера проектов */
+.projects-container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: 'Arial', sans-serif;
+}
+
+/* Стиль для заголовка списка проектов */
+.projects-container h2 {
+    font-size: 32px;
+    color: #7420d5; /* Цвет для заголовка */
+    margin-bottom: 20px;
+}
+
+/* Кнопка для создания нового проекта */
+.create-project-btn {
+    margin-bottom: 20px;
+    text-align: right;
+}
+
+.create-project-btn .btn {
+    background-color: #7420d5; /* Основной цвет */
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.create-project-btn .btn:hover {
+    background-color: #5b0fb2; /* Тёмный оттенок при наведении */
+}
+
+/* Список проектов */
+.projects-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.projects-list .project-item {
+    background-color: #f4f4f9; /* Светлый фон для каждого проекта */
+    margin-bottom: 15px;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Легкая тень */
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.projects-list .project-item:hover {
+    transform: translateY(-5px); /* Легкое поднятие элемента при наведении */
+    background-color: #e9e9f5; /* Легкая смена фона */
+}
+
+/* Ссылки на проекты */
+.project-link {
+    font-size: 18px;
+    color: #7420d5; /* Основной цвет для ссылок */
+    text-decoration: none;
+}
+
+.project-link:hover {
+    text-decoration: underline;
+}
+
+/* Сообщение, если нет проектов */
+.no-projects-message {
+    font-size: 18px;
+    color: #555;
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* Медиазапрос для мобильных устройств */
+@media (max-width: 768px) {
+    .projects-container {
+        margin: 20px;
+        padding: 15px;
+    }
+
+    .projects-container h2 {
+        font-size: 28px;
+    }
+
+    .projects-list .project-item {
+        font-size: 16px;
+        padding: 10px;
+    }
+
+    .create-project-btn .btn {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
+}

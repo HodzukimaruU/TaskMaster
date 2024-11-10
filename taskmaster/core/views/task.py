@@ -2,14 +2,15 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseForbidden
+from django.http import HttpRequest, HttpResponse
 
 from core.models import Project, Task, TaskAssignmentNotification
 from core.forms import TaskForm
 from core.utils import get_user_role_in_project
 
-# Task View
+
 @login_required
-def task_list(request):
+def task_list(request: HttpRequest) -> HttpResponse:
     projects = Project.objects.filter(
         Q(owner=request.user) | Q(members=request.user)
     ).distinct()
@@ -44,8 +45,9 @@ def task_list(request):
         'projects_with_tasks': projects_with_tasks
     })
 
+
 @login_required
-def task_create(request):
+def task_create(request: HttpRequest) -> HttpResponse:
     project = None
     if 'project' in request.GET:
         project_id = request.GET['project']
@@ -76,8 +78,9 @@ def task_create(request):
 
     return render(request, 'task_form.html', {'form': form})
 
+
 @login_required
-def task_update(request, pk):
+def task_update(request: HttpRequest, pk: int) -> HttpResponse:
     task = get_object_or_404(Task, pk=pk)
     hide_assigned = task.project is None
     project = task.project
@@ -105,8 +108,9 @@ def task_update(request, pk):
 
     return render(request, 'task_form.html', {'form': form})
 
+
 @login_required
-def task_detail(request, pk):
+def task_detail(request: HttpRequest, pk: int) -> HttpResponse:
     task = get_object_or_404(Task, pk=pk)
 
     role = None
@@ -121,8 +125,9 @@ def task_detail(request, pk):
 
     return render(request, 'task_detail.html', {'task': task, 'role': role})
 
+
 @login_required
-def task_delete(request, pk):
+def task_delete(request: HttpRequest, pk: int) -> HttpResponse:
     task = get_object_or_404(Task, pk=pk)
     project = task.project
     role = get_user_role_in_project(request.user, project)

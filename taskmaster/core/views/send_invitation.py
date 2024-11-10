@@ -1,13 +1,14 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpRequest, HttpResponse
 
 from core.models import Project, ProjectInvitation
 from core.forms import ProjectInvitationForm
 
-#sent invite view
+
 @login_required
-def send_invitation_view(request, project_id):
+def send_invitation_view(request: HttpRequest, project_id: int) -> HttpResponse:
     project = get_object_or_404(Project, id=project_id, owner=request.user)
     search_query = request.GET.get("search_user", "")
     selected_user = None
@@ -16,7 +17,7 @@ def send_invitation_view(request, project_id):
     if search_query:
         selected_user = User.objects.filter(username=search_query).first()
         if not selected_user:
-            error_message = "User not found"
+            error_message = "Пользователь не найден"
 
     if request.method == 'POST':
         selected_username = request.POST.get("selected_user")
@@ -40,7 +41,7 @@ def send_invitation_view(request, project_id):
                 invitation.invited_user = invited_user
                 invitation.save()
 
-                success_message = f"An invitation has been sent to the user {invited_user.username}."
+                success_message = f"Приглашение отправлено пользователю {invited_user.username}."
                 return render(request, 'send_invitation.html', {
                     'project': project,
                     'search_query': search_query,
@@ -48,7 +49,7 @@ def send_invitation_view(request, project_id):
                     'success_message': success_message,
                 })
             else:
-                error_message = "Error sending invitation."
+                error_message = "Ошибка при отправке приглашения."
 
     return render(request, 'send_invitation.html', {
         'form': ProjectInvitationForm(),
@@ -58,8 +59,9 @@ def send_invitation_view(request, project_id):
         'error_message': error_message,
     })
 
+
 @login_required
-def accept_invitation(request, invitation_id):
+def accept_invitation(request: HttpRequest, invitation_id: int) -> HttpResponse:
     invitation = get_object_or_404(ProjectInvitation, id=invitation_id, invited_user=request.user)
     
     if not invitation.is_accepted:
@@ -67,8 +69,9 @@ def accept_invitation(request, invitation_id):
     
     return redirect('notifications')
 
+
 @login_required
-def reject_invitation(request, invitation_id):
+def reject_invitation(request: HttpRequest, invitation_id: int) -> HttpResponse:
     invitation = get_object_or_404(ProjectInvitation, id=invitation_id, invited_user=request.user)
     
     if not invitation.is_accepted:

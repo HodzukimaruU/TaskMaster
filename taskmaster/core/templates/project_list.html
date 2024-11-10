@@ -1,14 +1,18 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>My Projects</h2>
-<a href="{% url 'project-create' %}">Create New Project</a>
-<ul>
-    {% for project in projects %}
-        <li>
-            <a href="{% url 'project-detail' project.id %}">{{ project.title }}</a>
-        </li>
-    {% empty %}
-        <p>You don't have any projects yet.</p>
-    {% endfor %}
-</ul>
+    <div class="projects-container">
+        <h2>My Projects</h2>
+        <div class="create-project-btn">
+            <a href="{% url 'project-create' %}" class="btn">Create New Project</a>
+        </div>
+        <ul class="projects-list">
+            {% for project in projects %}
+                <li class="project-item">
+                    <a href="{% url 'project-detail' project.id %}" class="project-link">{{ project.title }}</a>
+                </li>
+            {% empty %}
+                <p class="no-projects-message">You don't have any projects yet.</p>
+            {% endfor %}
+        </ul>
+    </div>
 {% endblock %}

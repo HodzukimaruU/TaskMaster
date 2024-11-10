@@ -1,22 +1,23 @@
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponseForbidden
+from django.http import HttpRequest, HttpResponse, HttpResponseForbidden
 
 from core.models import Project, ProjectMembership, ProjectChatMessage
 from core.forms import ProjectForm
 from core.utils import get_user_role_in_project
 
-# Project Views
+
 @login_required
-def project_list(request):
+def project_list(request: HttpRequest) -> HttpResponse:
     projects = Project.objects.filter(
         Q(owner=request.user) | Q(members=request.user)
     ).distinct()
     return render(request, 'project_list.html', {'projects': projects})
 
+
 @login_required
-def project_create(request):
+def project_create(request: HttpRequest) -> HttpResponse:
     if request.method == 'POST':
         form = ProjectForm(request.POST)
         if form.is_valid():
@@ -28,8 +29,9 @@ def project_create(request):
         form = ProjectForm()
     return render(request, 'project_form.html', {'form': form})
 
+
 @login_required
-def project_detail(request, pk):
+def project_detail(request: HttpRequest, pk: int) -> HttpResponse:
     project = Project.objects.filter(
         Q(pk=pk) & (Q(owner=request.user) | Q(members=request.user))
     ).distinct().first()
@@ -48,8 +50,9 @@ def project_detail(request, pk):
         'is_owner': is_owner
     })
 
+
 @login_required
-def project_update(request, pk):
+def project_update(request: HttpRequest, pk: int) -> HttpResponse:
     project = get_object_or_404(Project, pk=pk, owner=request.user)
     if request.method == 'POST':
         form = ProjectForm(request.POST, instance=project)
@@ -60,16 +63,18 @@ def project_update(request, pk):
         form = ProjectForm(instance=project)
     return render(request, 'project_form.html', {'form': form})
 
+
 @login_required
-def project_delete(request, pk):
+def project_delete(request: HttpRequest, pk: int) -> HttpResponse:
     project = get_object_or_404(Project, pk=pk, owner=request.user)
     if request.method == 'POST':
         project.delete()
         return redirect('project-list')
     return render(request, 'project_confirm_delete.html', {'project': project})
 
+
 @login_required
-def project_participants(request, pk):
+def project_participants(request: HttpRequest, pk: int) -> HttpResponse:
     project = get_object_or_404(Project, pk=pk)
 
     if project.owner != request.user and not project.members.filter(id=request.user.id).exists():
@@ -86,8 +91,9 @@ def project_participants(request, pk):
         'participants': participants
     })
 
+
 @login_required
-def project_chat(request, project_id):
+def project_chat(request: HttpRequest, project_id: int) -> HttpResponse:
     project = Project.objects.get(pk=project_id)
 
     if not ProjectMembership.objects.filter(project=project, user=request.user).exists() and project.owner != request.user:

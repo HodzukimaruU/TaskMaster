@@ -1,3 +1,4 @@
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.core.mail import send_mail
@@ -9,7 +10,8 @@ from core.forms import RegistrationForm
 import uuid
 import time
 
-def register_view(request):
+
+def register_view(request: HttpRequest) -> HttpResponse:
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
         if form.is_valid():

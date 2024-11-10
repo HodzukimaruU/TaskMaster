@@ -12,7 +12,7 @@ class BaseModel(models.Model):
     class Meta:
         abstract = True
 
-    
+
 class Project(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
@@ -22,10 +22,12 @@ class Project(models.Model):
     def __str__(self):
         return self.title
 
+
 class ProjectMembership(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     role = models.CharField(max_length=10, choices=[('viewer', 'Viewer'), ('editor', 'Editor')])
+
 
 class ProjectInvitation(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
@@ -71,6 +73,7 @@ class Task(models.Model):
     def __str__(self):
         return f"{self.title} - {self.get_priority_display()} - {self.get_status_display()}"
 
+
 class ConfirmationCode(BaseModel):
     code = models.UUIDField(default=uuid.uuid4, unique=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="confirmations")
@@ -78,6 +81,7 @@ class ConfirmationCode(BaseModel):
 
     def is_expired(self):
         return time.time() > self.expiration_time
+
 
 class ProjectChatMessage(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="chat_messages")
@@ -87,7 +91,8 @@ class ProjectChatMessage(models.Model):
 
     def __str__(self):
         return f"Message by {self.user.username} on {self.created_at}"
-    
+
+
 class TaskAssignmentNotification(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='task_notifications')
@@ -95,3 +100,4 @@ class TaskAssignmentNotification(models.Model):
 
     def __str__(self):
         return f"Notification for {self.user.username} about task {self.task.title}"
+    

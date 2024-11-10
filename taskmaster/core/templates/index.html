@@ -1,10 +1,20 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Profile</h1>
-    <p><strong>User:</strong> {{ user.username }}</p>
-    <p><strong>Email:</strong> {{ user.email }}</p>
-    <p><strong>First Name:</strong> {{ user.first_name }}</p>
-    <p><strong>Last Name:</strong> {{ user.last_name }}</p>
-<h2>We are glad to see you in TaskMaster - your tool for managing tasks and projects in a team.</h2>
+<div class="profile-container">
+    <div class="profile-header">
+        <h1>Welcome, {{ user.first_name }}!</h1>
+        <p class="intro-text">You're successfully logged in to TaskMaster — your tool for managing tasks and projects in a team.</p>
+    </div>
+    
+    <div class="profile-info">
+        <h2>Your Information:</h2>
+        <ul>
+            <li><strong>Username:</strong> {{ user.username }}</li>
+            <li><strong>Email:</strong> {{ user.email }}</li>
+            <li><strong>First Name:</strong> {{ user.first_name }}</li>
+            <li><strong>Last Name:</strong> {{ user.last_name }}</li>
+        </ul>
+    </div>
+</div>
 {% endblock %}

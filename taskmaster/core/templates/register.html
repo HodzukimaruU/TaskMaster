@@ -1,19 +1,18 @@
-<!-- templates/register.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    {% comment %} {% load static %} {% endcomment %}
+    {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registration</title>
-    {% comment %} <link rel="stylesheet" href="{% static 'css/style.css' %}"> {% endcomment %}
+    <link rel="stylesheet" href="{% static 'css/login_register.css' %}">
 </head>
 <body>
     <header>
         <h1>Registration</h1>
     </header>
     <div class="container">
-        <form method="POST">
+        <form method="POST" class="form-container">
             {% csrf_token %}
             {{ form.as_p }}
             <button type="submit" class="button">Sign up</button>
